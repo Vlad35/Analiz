@@ -1,0 +1,125 @@
+% var 1, 7 ----------------------------------------------------------------------------------------
+
+sumd(0,0):-!.
+sumd(N,X):- N1 is N div 10, sumd(N1, X1), X is X1 + N mod 10.
+
+proddiv(N,X):- proddiv(N,X,2,1).
+proddiv(N,X,D,P):- D =< N div 2 ->  
+    (   N mod D =:= 0 ->  sumd(N,S1), sumd(D, S2),
+        (   S2 < S1 ->   P1 is P*D;   P1 is P)
+    ;   P1 is P), D1 is D+1, proddiv(N,X,D1,P1) ;   X is P.
+	
+% вызывать нужно proddiv, к примеру:        proddiv(345, R).  
+%--------------------------------------------------------------------------------------------------
+    
+	
+	
+% variant 2, 8 ----------------------------------------------------------------------------------------
+
+nod(A,A,A):- !.
+nod(A,B,R):- A=\=B, A > B -> (   A1 is A - B , nod(A1,B,R) ); (   B1 is B - A,  nod(A,B1,R) ).
+
+f2(N,X,RES):- f2(N, X, RES, 0).
+f2(0,_,RES,RES):-!.
+f2(N,X,RES, R):- N=\=0, N1 is N mod 10, nod(N1, X, K),
+    (   K =:= 1 -> (    R1 is R + 1, N2 is N div 10, f2(N2,X,RES,R1)); (   N2 is N div 10, f2(N2, X, RES, R))).
+    
+result(N,R):- X is N div 2 + 1, result(N,R,X,0, N).
+result(_,RES,1,__,RES):-!.
+result(N,R,X,COUNT,RESULT):- X>2, X1 is X-1,
+     f2(N,X1,RES), (N mod X1 =:= 0, RES>COUNT) ->  X1 is X-1, result(N,R,X1,RES, X1); X1 is X-1, result(N,R,X1,COUNT, RESULT).
+     
+% вызывать нужно result, к примеру:        result(345, R).     f2 находит количество цифр взаимно простых с делителем числа
+%--------------------------------------------------------------------------------------------------
+
+
+
+% variant 3, 9 ----------------------------------------------------------------------------------------
+
+nod(A,A,A):- !.
+nod(A,B,R):- A=\=B, A > B -> (   A1 is A - B , nod(A1,B,R) ); (   B1 is B - A,  nod(A,B1,R) ).
+
+prost(N,R):-prost(N,R,1,0).
+prost(N,RES,X,RES):- X>N-1, !.
+prost(N,R,X,RES):- X<N-1, X1 is X+1, N mod X1 =:= 0 ->  X1 is X+1, RES1 is 1, prost(N,R,X1,RES1); X1 is X+1, prost(N,R,X1,RES).
+
+prod(N,R):-prod(N,R,1).
+prod(0,P,P):-!.
+prod(N,R,P):- N>0, N1 is N div 10, P1 is P*(N mod 10), prod(N1,R,P1).
+
+maxNechetDel(N,R):- maxNechetDel(N, R, -1, 1).
+maxNechetDel(N,RES,X,RES):- X > (N div 2 + 1), !.
+maxNechetDel(N,R,X, RES):- X < N div 2 + 1, X1 is X+2, prost(X1, A), 
+    (   N mod X1 =:= 0, A =:= 1, RES < X1) -> X1 is X+2, RES1 is X1, maxNechetDel(N,R,X1,RES1); X1 is X+2, maxNechetDel(N,R,X1,RES).
+
+result(N,R):- maxNechetDel(N,R1), prod(N,R2), nod(R1,R2,R3), R is R3. 
+
+% вызывать нужно result, к примеру:        result(345, R).     
+%--------------------------------------------------------------------------------------------------
+
+
+
+% variant 4, 10 ----------------------------------------------------------------------------------------
+
+nod(A,A,A):- !.
+nod(A,B,R):- A=\=B, A > B -> (   A1 is A - B , nod(A1,B,R) ); (   B1 is B - A,  nod(A,B1,R) ).
+
+sumd(0,0):-!.
+sumd(N,S):- N>0, N1 is N mod 10, N2 is N div 10,  sumd(N2, S1), (N1 < 5 ->  S is S1+N1; S is S1).
+
+mindel(N,R):-mindel(N,R,N+1,N).
+mindel(_,RES,2,RES):-!.
+mindel(N,R,X,RES):- X>2, X1 is X-1, N mod X1 =:= 0 ->  X1 is X-1, RES1 is X1, mindel(N,R,X1,RES1); X1 is X-1, mindel(N,R,X1,RES). 
+
+result(N,R):-result(N,R,0,-1).
+result(N,RES,N,RES):-!.
+result(N,R,X,RES):- X<N-1, X1 is X+1, nod(X1,N,A), mindel(N,A1), 
+    (   A =\= 1, X1 mod A1 =\= 0 ) -> X1 is X+1, sumd(N,A2), RES1 is X1*A2, result(N,R,X1,RES1); X1 is X+1, result(N,R,X1,RES). 
+	
+% вызывать нужно result, к примеру:        result(45, R).  
+%--------------------------------------------------------------------------------------------------
+
+
+
+% variant 5, 11 ----------------------------------------------------------------------------------------
+
+nod(A,A,A):-!.
+nod(A,B,R):- A=\=B, A>B -> ( A1 is A-B, nod(A1,B,R));(B1 is B-A, nod(A,B1,R)).
+
+prod(N,R):-prod(N,R,1).
+prod(0,P,P):-!.
+prod(N,R,P):- N>0, N1 is N div 10, P1 is P*(N mod 10), prod(N1,R,P1).
+
+sumd(0,0):-!.
+sumd(N,X):- N1 is N div 10, sumd(N1, X1), X is X1 + N mod 10.
+
+result(N,R):- result(N, R, 0, 0).
+result(N,RES,X,RES):- X > (N div 2 + 1), !.
+result(N,R,X, RES):- X < N div 2 + 1, X1 is X+1, sumd(N,K1), prod(N,K2), nod(X1,K1,A1), nod(X1,K2,A2),
+    (   N mod X1 =:= 0, A1 =:= 1, A2 =\= 1) -> X1 is X+1, RES1 is RES + X1, result(N,R,X1,RES1); X1 is X+1, result(N,R,X1,RES).
+	
+% вызывать нужно result, к примеру:        result(345, R).     
+%--------------------------------------------------------------------------------------------------
+
+
+
+% variant 6, 12 ----------------------------------------------------------------------------------------
+
+nod(A,A,A):- !.
+nod(A,B,R):- A=\=B, A > B -> (   A1 is A - B , nod(A1,B,R) ); (   B1 is B - A,  nod(A,B1,R) ).
+
+prost(N,R):-prost(N,R,1,0).
+prost(N,RES,X,RES):- X>N-1, !.
+prost(N,R,X,RES):- X<N-1, X1 is X+1, N mod X1 =:= 0 ->  X1 is X+1, RES1 is 1, prost(N,R,X1,RES1); X1 is X+1, prost(N,R,X1,RES).
+
+sumd(0,0):-!.
+sumd(N,S):- N>0, N1 is N mod 10, N2 is N div 10, prost(N1,A),  sumd(N2, S1), (A=:=0 ->  S is S1+N1; S is S1).
+
+sumDel(N,R):- sumDel(N, R, 0, 0).
+sumDel(N,RES,N,RES):-!.
+sumDel(N,R,X, RES):- X < N, X1 is X+1, 
+    (   N mod X1 =\= 0,  sumd(N, K1), nod(X1,K1,A1), nod(N,X1,A2),  A1 =:= 1, A2 =\= 1) -> 
+    X1 is X+1, RES1 is RES+1, sumDel(N,R,X1,RES1); X1 is X+1, sumDel(N,R,X1,RES).
+	
+% вызывать нужно sumDel, к примеру:        sumDel(45, R).  	
+%--------------------------------------------------------------------------------------------------	
